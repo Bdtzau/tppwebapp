@@ -87,7 +87,7 @@ client.connect();
 // message handler
 client.addListener('chat', function (channel, user, message) {
 	// console.log(user.username + ': ' + message);
-	if ( (message.search(bet_re) == 0) && duringBetting ) {
+	if ( (message.search(bet_re) == 0) && (duringBetting == true) ) {
 		tempName = user.username;
 		tempMsg = message.replace(bet_re, '');
 		
@@ -115,6 +115,33 @@ client.addListener('chat', function (channel, user, message) {
 	} else
 	if (user.username == "tppinfobot") {
 		console.log("tppinfobot: " + message);
+
+		if (message.search("A new match is about to begin!") >= 0) {
+			duringBetting = true;
+			console.log("Betting period opened");
+		} else
+		if ( (message.search("The battle between") >= 0) && (message.search("has just begun!") > 0) ) {
+			duringBattle = true;
+			duringBetting = false;
+			console.log("Battle has begun");
+		} else
+		if (message.search(" won the match") > 0) {
+			duringBattle = false;
+			tempTeam = message.match(team_re);
+			for (var i = 0; i < playerList.length; i++) {
+				var player = playerList[i];
+				if (player.playerTeam == tempTeam) {
+					player.playerGold += player.playerBet * tempTeam.teamPayout;
+				} else
+				if (player.playerTeam){
+					player.playerGold -= player.playerBet;
+				}
+				player.playerBet = 0;
+				player.playerTeam = "";
+				updateOdds;
+			};
+		}
+
 	} else
 	if (user.username == "tppbankbot") {
 		console.log("tppbankbot: " + message);
@@ -139,30 +166,6 @@ client.addListener('chat', function (channel, user, message) {
 			
 			console.log( tempName + " " + tempGold );
 			// message.search(username_re)
-		}else
-		if (message.search("A new match is about to begin!") >= 0) {
-			duringBetting = true;
-			console.log("Betting period opened");
-		} else
-		if ( (message.search("The battle between") >= 0) && (message.search("has just begun!") > 0) ) {
-			duringBattle = true;
-			duringBetting = false;
-			console.log("Battle has begun");
-		} else
-		if (message.search(" won the match") > 0) {
-			duringBattle = false;
-			tempTeam = message.match(team_re);
-			for (var i = 0; i < playerList.length; i++) {
-				var player = playerList[i];
-				if (player.playerTeam == tempTeam) {
-					player.playerGold += player.playerBet * tempTeam.teamPayout;
-				} else
-				if (player.playerTeam){
-					player.playerGold -= player.playerBet;
-				}
-				player.playerBet = 0;
-				player.playerTeam = "";
-			};
 		}
 	}
 });
@@ -175,52 +178,3 @@ client.addListener('chat', function (channel, user, message) {
 // }).listen(1337, '127.0.0.1');
 
 
-//freenode = 91.217.189.42
-
-// ___badnik___
-//badnik tpp config
-// var irc = require('irc');
-// var channel = '#tpp';
-// var client = new irc.Client('irc.badnik.net', 'botzau', {
-// 	channels: [channel],
-// 	encoding: "UTF-8",
-// });
-
-//message handler
-// client.addListener('message#twitchplayspokemon', function (from, message) {
-// 	console.log(from + ' => #tpp: ' + message);
-// 	// checks if message begins with @username
-// 	if (message.search(username_re) == 0) {
-// 		x++;
-// 		// client.say('#tpp', message);
-// 		console.log(message);
-// 	}
-// });
-// ___end badnik___
-
-// ___old twitch connect___
-// var client = new irc.Client('irc.twitch.tv', 'blueskydry', {
-// 	userName: 'blueskydry',
-// 	sasl: false,
-// 	secure: false,
-// 	password: 'oauth:b7l1kc274q4zpf12p0qqn3ak1wyrcg',
-// 	channels: [channel],
-// 	encoding: "UTF-8",
-// 	port: 6667,
-// 	showErrors: true,
-// 	floodProtection: true,
-// 	floodProtectionDelay: 100000,
-// });
-// client.join('#twitchplayspokemon oauth:ixd0ee01u4tb1xazp4rqxn8aevigj7');
-
-// exception handler
-// client.addListener('error', function(message) {
-// 	console.log('error: ', message);
-// });
-
-//login confirmation
-// badnik
-// client.addListener('registered', function(message) {
-// 	console.log("Registered with server:", message);
-// })
-// ___end old twitch connect___
