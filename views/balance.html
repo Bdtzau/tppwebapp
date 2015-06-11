@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hello world!</title>
+    <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body>
+
+<%if (balance) { %>
+    Hello, <%=user %>, your balance is: <span id="balance"></span>!
+<script>
+var user = {
+    username: '<%=user %>',
+    balance: '<%=balance %>'
+};
+var balanceTxt = document.getElementById('balance');
+balanceTxt.innerText = user.balance;
+console.debug(user);
+function increase() {
+    user.balance = parseInt(user.balance) + 100;
+    balanceTxt.innerText = user.balance;
+}
+    </script>
+
+<% } else { %>
+You cannot be found in our database :(
+<% } %>
+
+
+</body>
+</html>
